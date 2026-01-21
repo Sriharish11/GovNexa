@@ -1,0 +1,208 @@
+✅ FINAL MASTER PROJECT PROMPT – GovNexa
+🔷 Project Name
+
+GovNexa
+
+🔷 Tagline
+
+GovNexa – One Platform. Every Government Opportunity.
+
+🔷 Project Vision
+
+Build a nationwide, real-time government examination notification platform that aggregates only official, live data for ALL government recruitment exams in India, including administrative, banking, defence, intelligence, police, and uniformed services.
+
+The platform must not use sample or manually fed data.
+All information must be fetched directly from official government sources and kept continuously updated.
+
+🔷 Exam Coverage (MANDATORY & EXPLICIT)
+1️⃣ Central Government Exams
+
+UPSC (CSE, CDS, NDA, CAPF, IES, CMS, etc.)
+
+SSC (CGL, CHSL, MTS, JE, Steno, Selection Post)
+
+Banking (IBPS PO/Clerk/SO/RRB, SBI PO/Clerk)
+
+Railways (RRB NTPC, Group D, ALP, Technician)
+
+2️⃣ Intelligence & Law Enforcement Exams (CRITICAL)
+
+CBI (Sub Inspector, DSP via SSC/UPSC)
+
+Intelligence Bureau (IB) – ACIO, JIO, SA
+
+NIA
+
+ED (Enforcement Directorate)
+
+SFIO
+
+Customs & Excise
+
+Income Tax
+
+Assistant Section Officer (ASO) posts
+
+3️⃣ Police, SI & Uniformed Services
+
+State Police SI / Constable exams (ALL STATES)
+
+CAPF (CRPF, BSF, CISF, ITBP, SSB)
+
+Indian Army, Navy, Air Force
+
+Coast Guard
+
+Home Guard
+
+Forest Guard & Ranger
+
+Fire & Rescue Services
+
+4️⃣ State Government Exams (ALL STATES)
+
+TNPSC
+
+UPPSC, MPSC, RPSC, KPSC
+
+APPSC, TSPSC
+
+Kerala PSC
+
+BPSC, JPSC, GPSC
+
+ALL other State PSCs & Police Recruitment Boards
+
+📌 No state or department should be excluded
+
+🔷 Data Rules (STRICT – NON-NEGOTIABLE)
+
+Fetch data only from official government websites
+
+Parse:
+
+Notifications
+
+PDFs
+
+Tables
+
+Recruitment portals
+
+Auto-refresh data
+
+Display Last Updated Timestamp
+
+❌ No static datasets
+❌ No mock/sample entries
+❌ No reliance on unofficial blogs
+
+🔷 Exam Data Fields (STANDARDIZED)
+
+Each exam entry must include:
+
+Exam Name
+
+Department / Organization
+
+Exam Category (UPSC / Police / Intelligence / Banking / PSC etc.)
+
+Notification Date
+
+Application Start Date
+
+Application End Date
+
+Exam Date(s)
+
+Official Apply Link
+
+Official Notification PDF
+
+Status (Upcoming / Ongoing / Closed)
+
+🔷 Real-Time Notification System
+🔔 Alerts for:
+
+New notifications
+
+Application start
+
+Last date reminders
+
+Exam date announcements
+
+Admit card release
+
+📩 Delivery Channels:
+
+Email
+
+WhatsApp (via WhatsApp Business API)
+
+Users must be able to:
+
+Subscribe by exam type
+
+Subscribe by state
+
+Subscribe by department (CBI, IB, Police, PSC, etc.)
+
+Set reminder timing
+
+Opt-in / opt-out anytime
+
+🔷 Web Interface (Static + Dynamic Data)
+UI Pages
+
+Home (Live exam feed)
+
+Exam Categories
+
+Exam Detail Page
+
+Notification Preferences
+
+About GovNexa
+
+UX Requirements
+
+Mobile-first design
+
+Clean, distraction-free UI
+
+Fast loading
+
+Search & filters (exam, state, department)
+
+🔷 Admin & Automation (Behind the Scenes)
+
+Source monitoring dashboard
+
+Fetch failure alerts
+
+Auto-retry mechanisms
+
+No manual data insertion
+
+🔷 Branding
+
+Logo: GovNexa
+
+Theme: Trustworthy, official, minimal
+
+Colors: Blue / White / Accent
+
+🔷 Success Metrics
+
+100% official live data
+
+Zero missed major notifications
+
+Reliable delivery of alerts
+
+Full exam coverage (including CBI, IB, SI, Police)
+
+🔷 One-Line Summary (Viva Ready)
+
+GovNexa is a centralized real-time platform that aggregates official government recruitment notifications across administrative, intelligence, police, and uniformed services in India.
