@@ -1,7 +1,6 @@
 import { db } from "./db";
-import { exams, subscriptions, notifications, InsertExam, InsertSubscription, InsertNotification, users } from "@shared/schema";
+import { exams, notifications, InsertExam, InsertNotification } from "@shared/schema";
 import { eq, desc, and, ilike, or } from "drizzle-orm";
-import { authStorage } from "./replit_integrations/auth/storage"; // Reuse auth storage for user lookups if needed
 
 export interface IStorage {
   // Exams
@@ -9,11 +8,6 @@ export interface IStorage {
   getExam(id: number): Promise<typeof exams.$inferSelect | undefined>;
   createExam(exam: InsertExam): Promise<typeof exams.$inferSelect>;
   updateExam(id: number, updates: Partial<InsertExam>): Promise<typeof exams.$inferSelect | undefined>;
-  
-  // Subscriptions
-  getSubscriptions(userId: string): Promise<typeof subscriptions.$inferSelect[]>;
-  createSubscription(sub: InsertSubscription): Promise<typeof subscriptions.$inferSelect>;
-  deleteSubscription(id: number, userId: string): Promise<void>;
   
   // Notifications
   getNotifications(): Promise<typeof notifications.$inferSelect[]>;
@@ -67,19 +61,6 @@ export class DatabaseStorage implements IStorage {
   async updateExam(id: number, updates: Partial<InsertExam>) {
     const [updated] = await db.update(exams).set({ ...updates, lastUpdated: new Date() }).where(eq(exams.id, id)).returning();
     return updated;
-  }
-
-  async getSubscriptions(userId: string) {
-    return db.select().from(subscriptions).where(eq(subscriptions.userId, userId));
-  }
-
-  async createSubscription(sub: InsertSubscription) {
-    const [newSub] = await db.insert(subscriptions).values(sub).returning();
-    return newSub;
-  }
-
-  async deleteSubscription(id: number, userId: string) {
-    await db.delete(subscriptions).where(and(eq(subscriptions.id, id), eq(subscriptions.userId, userId)));
   }
   
   async getNotifications() {

@@ -1,5 +1,5 @@
 import pLimit from "p-limit";
-import pRetry from "p-retry";
+import pRetry, { AbortError } from "p-retry";
 
 /**
  * Batch Processing Utilities
@@ -103,16 +103,28 @@ export async function batchProcess<T, R>(
             onProgress?.(completed, items.length, item);
             return result;
           } catch (error: unknown) {
-            if (isRateLimitError(error)) {
-              throw error; // Rethrow to trigger p-retry
+            // If we hit a non-retriable error (like 400 Bad Request), abort
+            if (isRateLimitError(error) === false && error instanceof Error) {
+              // 4xx errors (except 429) should generally not be retried
+              if (error.message.includes("400") || error.message.includes("404")) {
+                throw new AbortError(error.message);
+              }
             }
-            // For non-rate-limit errors, abort immediately
-            throw new pRetry.AbortError(
-              error instanceof Error ? error : new Error(String(error))
-            );
+            throw error;
           }
         },
-        { retries, minTimeout, maxTimeout, factor: 2 }
+        {
+          retries,
+          minTimeout,
+          maxTimeout,
+          factor: 2,
+          onFailedAttempt: (error) => {
+            const isRateLimit = isRateLimitError(error);
+            if (!isRateLimit && error instanceof Error && !error.message.includes("429")) {
+              throw new AbortError(error.message);
+            }
+          },
+        }
       )
     )
   );
@@ -156,7 +168,7 @@ export async function batchProcessWithSSE<T, R>(
           factor: 2,
           onFailedAttempt: (error) => {
             if (!isRateLimitError(error)) {
-              throw new pRetry.AbortError(
+              throw new AbortError(
                 error instanceof Error ? error : new Error(String(error))
               );
             }

@@ -32,11 +32,6 @@ export default function Home() {
                     Browse Active Exams
                   </div>
                 </Link>
-                <Link href="/subscriptions">
-                  <div className="px-6 py-3 bg-white/10 text-white border border-white/20 font-semibold rounded-lg hover:bg-white/20 transition-all cursor-pointer">
-                    Manage Alerts
-                  </div>
-                </Link>
               </div>
             </div>
             

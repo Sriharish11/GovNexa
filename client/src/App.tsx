@@ -7,9 +7,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/Home";
 import Exams from "@/pages/Exams";
 import ExamDetail from "@/pages/ExamDetail";
-import Subscriptions from "@/pages/Subscriptions";
 import Admin from "@/pages/Admin";
-import Login from "@/pages/Login";
 
 function Router() {
   return (
@@ -17,9 +15,7 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/exams" component={Exams} />
       <Route path="/exams/:id" component={ExamDetail} />
-      <Route path="/subscriptions" component={Subscriptions} />
       <Route path="/admin" component={Admin} />
-      <Route path="/login" component={Login} />
       
       {/* Fallback to 404 */}
       <Route component={NotFound} />

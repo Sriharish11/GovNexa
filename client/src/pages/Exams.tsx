@@ -12,7 +12,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
-import { useDebounce } from "@/hooks/use-debounce"; // We'll implement this simple hook inline or use standard pattern
 import { motion } from "framer-motion";
 
 // Simple debounce hook for search

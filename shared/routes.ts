@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { insertExamSchema, exams, subscriptions, insertSubscriptionSchema, notifications } from './schema';
+import { insertExamSchema, exams, notifications } from './schema';
 
 // Shared error schemas
 export const errorSchemas = {
@@ -57,32 +57,6 @@ export const api = {
       },
     },
   },
-  subscriptions: {
-    list: {
-      method: 'GET' as const,
-      path: '/api/subscriptions',
-      responses: {
-        200: z.array(z.custom<typeof subscriptions.$inferSelect>()),
-      },
-    },
-    create: {
-      method: 'POST' as const,
-      path: '/api/subscriptions',
-      input: insertSubscriptionSchema.omit({ userId: true }), // UserId inferred from session
-      responses: {
-        201: z.custom<typeof subscriptions.$inferSelect>(),
-        400: errorSchemas.validation,
-      },
-    },
-    delete: {
-      method: 'DELETE' as const,
-      path: '/api/subscriptions/:id',
-      responses: {
-        204: z.void(),
-        404: errorSchemas.notFound,
-      },
-    },
-  },
   notifications: {
     list: {
       method: 'GET' as const,
@@ -107,5 +81,4 @@ export function buildUrl(path: string, params?: Record<string, string | number>)
 }
 
 export type Exam = typeof exams.$inferSelect;
-export type Subscription = typeof subscriptions.$inferSelect;
 export type Notification = typeof notifications.$inferSelect;

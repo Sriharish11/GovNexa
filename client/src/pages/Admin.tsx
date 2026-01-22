@@ -1,12 +1,13 @@
 import { Sidebar } from "@/components/Sidebar";
 import { useExams } from "@/hooks/use-exams";
 import { CreateExamDialog } from "@/components/CreateExamDialog";
-import { useAuth } from "@/hooks/use-auth";
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { StatusBadge } from "@/components/StatusBadge";
 import { format } from "date-fns";
-import { Edit, Eye, Lock } from "lucide-react";
+import { Edit, Eye, RefreshCw } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useToast } from "@/hooks/use-toast";
 import {
   Table,
   TableBody,
@@ -17,26 +18,38 @@ import {
 } from "@/components/ui/table";
 
 export default function Admin() {
-  const { user, isAuthenticated } = useAuth();
   const { data: exams, isLoading } = useExams();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  // Basic authorization check
-  if (!isAuthenticated || !user?.email?.includes("admin")) { // Simplified check
-    return (
-      <div className="flex h-screen bg-background items-center justify-center p-4">
-        <div className="max-w-md w-full text-center bg-card p-8 rounded-xl shadow-lg border border-border">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <Lock className="w-8 h-8 text-red-600" />
-          </div>
-          <h1 className="text-2xl font-bold text-foreground mb-2">Access Denied</h1>
-          <p className="text-muted-foreground mb-6">You do not have administrative privileges to view this page.</p>
-          <Link href="/">
-            <Button className="w-full">Return Home</Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const updateMutation = useMutation({
+    mutationFn: async () => {
+      const res = await fetch("/api/admin/trigger-update", {
+        method: "POST",
+      });
+      if (!res.ok) throw new Error("Failed to trigger update");
+      return await res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/exams"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/notifications"] });
+      
+      const updates = data.updates || [];
+      toast({
+        title: "Update Completed",
+        description: updates.length > 0 
+          ? `Found ${updates.length} updates: ${updates.join(", ")}`
+          : "No new updates found.",
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Update Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
 
   return (
     <div className="flex h-screen bg-background text-foreground overflow-hidden">
@@ -48,7 +61,18 @@ export default function Admin() {
               <h1 className="text-3xl font-serif font-bold text-primary">Administration</h1>
               <p className="text-muted-foreground mt-1">Manage exam notifications and system data.</p>
             </div>
-            <CreateExamDialog />
+            <div className="flex gap-2">
+              <Button 
+                variant="outline" 
+                onClick={() => updateMutation.mutate()}
+                disabled={updateMutation.isPending}
+                className="gap-2"
+              >
+                <RefreshCw className={`w-4 h-4 ${updateMutation.isPending ? "animate-spin" : ""}`} />
+                {updateMutation.isPending ? "Checking..." : "Check for Updates"}
+              </Button>
+              <CreateExamDialog />
+            </div>
           </div>
 
           <div className="bg-card rounded-xl border border-border shadow-sm overflow-hidden">

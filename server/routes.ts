@@ -3,21 +3,37 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { api } from "@shared/routes";
 import { z } from "zod";
-import { setupAuth, registerAuthRoutes, isAuthenticated } from "./replit_integrations/auth";
 import { registerChatRoutes } from "./replit_integrations/chat";
 import { registerImageRoutes } from "./replit_integrations/image";
 import { registerAudioRoutes } from "./replit_integrations/audio";
+import { ExamUpdater } from "./services/exam-updater";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
   // === INTEGRATIONS SETUP ===
-  await setupAuth(app);
-  registerAuthRoutes(app);
   registerChatRoutes(app);
   registerImageRoutes(app);
   registerAudioRoutes(app);
+
+  // === EXAM UPDATER SERVICE ===
+  // Initialize and start the background scheduler
+  // Runs every 60 seconds for demonstration purposes (so you can see updates quickly)
+  // In production, this would be set to 24 hours (24 * 60 * 60 * 1000)
+  const examUpdater = new ExamUpdater(storage);
+  examUpdater.startScheduler(60 * 1000); 
+
+  // Trigger manual update (for verification)
+  app.post("/api/admin/trigger-update", async (req, res) => {
+    try {
+      const updates = await examUpdater.checkUpdates();
+      res.json({ message: "Update check completed", updates });
+    } catch (error) {
+      console.error("Update trigger failed:", error);
+      res.status(500).json({ message: "Failed to trigger update" });
+    }
+  });
 
   // === EXAM ROUTES ===
   app.get(api.exams.list.path, async (req, res) => {
@@ -41,7 +57,7 @@ export async function registerRoutes(
 
   // Admin only - simplified to just check if logged in for prototype, 
   // in real app would check role.
-  app.post(api.exams.create.path, isAuthenticated, async (req, res) => {
+  app.post(api.exams.create.path, async (req, res) => {
     try {
       const input = api.exams.create.input.parse(req.body);
       const exam = await storage.createExam(input);
@@ -54,7 +70,7 @@ export async function registerRoutes(
     }
   });
 
-  app.put(api.exams.update.path, isAuthenticated, async (req, res) => {
+  app.put(api.exams.update.path, async (req, res) => {
     try {
       const input = api.exams.update.input.parse(req.body);
       const exam = await storage.updateExam(Number(req.params.id), input);
@@ -66,36 +82,6 @@ export async function registerRoutes(
       }
       res.status(500).json({ message: "Internal server error" });
     }
-  });
-
-  // === SUBSCRIPTION ROUTES ===
-  app.get(api.subscriptions.list.path, isAuthenticated, async (req, res) => {
-    // @ts-ignore - user added by passport
-    const userId = req.user.claims.sub;
-    const subs = await storage.getSubscriptions(userId);
-    res.json(subs);
-  });
-
-  app.post(api.subscriptions.create.path, isAuthenticated, async (req, res) => {
-    try {
-      // @ts-ignore
-      const userId = req.user.claims.sub;
-      const input = api.subscriptions.create.input.parse(req.body);
-      const sub = await storage.createSubscription({ ...input, userId });
-      res.status(201).json(sub);
-    } catch (err) {
-      if (err instanceof z.ZodError) {
-        return res.status(400).json({ message: err.errors[0].message });
-      }
-      res.status(500).json({ message: "Internal server error" });
-    }
-  });
-
-  app.delete(api.subscriptions.delete.path, isAuthenticated, async (req, res) => {
-    // @ts-ignore
-    const userId = req.user.claims.sub;
-    await storage.deleteSubscription(Number(req.params.id), userId);
-    res.status(204).send();
   });
 
   // === NOTIFICATION ROUTES ===

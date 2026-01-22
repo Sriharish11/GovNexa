@@ -22,7 +22,7 @@ export function useExams(filters?: {
   return useQuery({
     queryKey: [api.exams.list.path, filters],
     queryFn: async () => {
-      const res = await fetch(path, { credentials: "include" });
+      const res = await fetch(path);
       if (!res.ok) throw new Error("Failed to fetch exams");
       return api.exams.list.responses[200].parse(await res.json());
     },
@@ -34,7 +34,7 @@ export function useExam(id: number) {
     queryKey: [api.exams.get.path, id],
     queryFn: async () => {
       const url = buildUrl(api.exams.get.path, { id });
-      const res = await fetch(url, { credentials: "include" });
+      const res = await fetch(url);
       if (res.status === 404) return null;
       if (!res.ok) throw new Error("Failed to fetch exam");
       return api.exams.get.responses[200].parse(await res.json());
@@ -53,7 +53,6 @@ export function useCreateExam() {
         method: api.exams.create.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(validated),
-        credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to create exam");
       return api.exams.create.responses[201].parse(await res.json());
@@ -74,7 +73,6 @@ export function useUpdateExam() {
         method: api.exams.update.method,
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(validated),
-        credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to update exam");
       return api.exams.update.responses[200].parse(await res.json());

@@ -1,13 +1,8 @@
 import { Link, useLocation } from "wouter";
-import { useAuth } from "@/hooks/use-auth";
 import { 
   Building2, 
-  Bell, 
   Home, 
   Settings, 
-  ShieldCheck, 
-  LogOut, 
-  LogIn,
   Menu,
   X
 } from "lucide-react";
@@ -16,18 +11,13 @@ import { cn } from "@/lib/utils";
 
 export function Sidebar() {
   const [location] = useLocation();
-  const { user, logout, isAuthenticated } = useAuth();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   const links = [
     { href: "/", label: "Dashboard", icon: Home },
     { href: "/exams", label: "Browse Exams", icon: Building2 },
-    { href: "/subscriptions", label: "My Subscriptions", icon: Bell },
+    { href: "/admin", label: "Administration", icon: Settings }
   ];
-
-  if (isAuthenticated && user?.email?.includes("admin")) { // Simplified admin check
-    links.push({ href: "/admin", label: "Administration", icon: Settings });
-  }
 
   const NavItem = ({ href, label, icon: Icon }: any) => {
     const isActive = location === href;
@@ -75,7 +65,7 @@ export function Sidebar() {
         <div className="p-6 border-b border-border/50 bg-gradient-to-r from-primary/5 to-transparent">
           <div className="flex items-center gap-3">
             <div className="bg-primary p-2 rounded-lg">
-              <ShieldCheck className="w-6 h-6 text-secondary" />
+              <img src="/favicon.png" alt="GovNexa Logo" className="w-6 h-6" />
             </div>
             <div>
               <h1 className="text-xl font-serif font-bold text-primary">GovNexa</h1>
@@ -93,33 +83,9 @@ export function Sidebar() {
 
         {/* User Section */}
         <div className="p-4 border-t border-border bg-muted/30">
-          {isAuthenticated ? (
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 px-2">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold border border-primary/20">
-                  {user?.firstName?.[0] || user?.email?.[0]?.toUpperCase()}
-                </div>
-                <div className="overflow-hidden">
-                  <p className="text-sm font-semibold truncate">{user?.firstName || "User"}</p>
-                  <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
-                </div>
-              </div>
-              <button 
-                onClick={() => logout()}
-                className="w-full flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
-              >
-                <LogOut size={16} />
-                Sign Out
-              </button>
-            </div>
-          ) : (
-            <a href="/api/login" className="block">
-              <div className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-primary text-primary-foreground hover:bg-primary/90 rounded-lg transition-all shadow-lg hover:shadow-xl font-medium cursor-pointer">
-                <LogIn size={18} />
-                Sign In
-              </div>
-            </a>
-          )}
+          <div className="text-center text-sm text-muted-foreground p-2">
+            Welcome to Gov-Nexa
+          </div>
         </div>
       </aside>
     </>
