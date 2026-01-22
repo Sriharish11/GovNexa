@@ -40,6 +40,11 @@ export async function registerRoutes(
     }
   });
 
+  // === HEALTH CHECK ===
+  app.get("/api/health", (req, res) => {
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
+  });
+
   // === EXAM ROUTES ===
   app.get(api.exams.list.path, async (req, res) => {
     const filters = {
@@ -96,7 +101,10 @@ export async function registerRoutes(
   });
 
   // === SEED DATA ===
-  await seedDatabase();
+  // Only seed if NOT on Vercel to prevent timeouts
+  if (!process.env.VERCEL) {
+    await seedDatabase();
+  }
 
   return httpServer;
 }
@@ -147,64 +155,32 @@ async function seedDatabase() {
         title: "SBI Probationary Officers 2026",
         organization: "SBI",
         category: "Banking",
-        status: "Closed",
+        status: "Upcoming",
         description: "Recruitment of Probationary Officers in State Bank of India.",
-        applicationStartDate: new Date("2025-09-01"),
-        applicationEndDate: new Date("2025-09-21"),
-        examDate: new Date("2025-11-15"),
-        notificationUrl: "https://sbi.co.in/careers",
+        applicationStartDate: new Date("2026-09-01"),
+        applicationEndDate: new Date("2026-09-21"),
+        examDate: new Date("2026-11-15"),
+        notificationUrl: "https://sbi.co.in",
         applyUrl: "https://sbi.co.in/careers"
       },
       {
-        title: "TNPSC Group 4 2026",
-        organization: "TNPSC",
-        category: "State PSC",
-        status: "Upcoming",
-        description: "Combined Civil Services Examination IV (Group-IV Services).",
-        applicationStartDate: new Date("2026-01-30"),
-        applicationEndDate: new Date("2026-02-28"),
-        examDate: new Date("2026-06-09"),
-        notificationUrl: "https://tnpsc.gov.in",
-        applyUrl: "https://tnpsc.gov.in"
-      },
-      {
-        title: "CBI Sub Inspector (SSC CGL)",
-        organization: "CBI",
-        category: "Intelligence",
-        status: "Upcoming",
-        description: "Recruitment of Sub Inspectors in Central Bureau of Investigation via SSC CGL.",
-        applicationStartDate: new Date("2026-04-01"),
-        applicationEndDate: new Date("2026-05-01"),
-        examDate: new Date("2026-07-15"),
-        notificationUrl: "https://ssc.nic.in",
-        applyUrl: "https://ssc.nic.in"
+        title: "RRB NTPC 2026",
+        organization: "Railway Recruitment Board",
+        category: "Railway",
+        status: "Closed",
+        description: "Non-Technical Popular Categories recruitment.",
+        applicationStartDate: new Date("2025-12-01"),
+        applicationEndDate: new Date("2025-12-31"),
+        examDate: new Date("2026-02-15"),
+        notificationUrl: "https://indianrailways.gov.in",
+        applyUrl: "https://indianrailways.gov.in"
       }
     ];
 
     for (const exam of initialExams) {
       await storage.createExam(exam);
     }
-  }
-
-  const existingNotifications = await storage.getNotifications();
-  if (existingNotifications.length === 0) {
-    console.log("Seeding initial notifications...");
-    const exams = await storage.getExams();
-    if (exams.length > 0) {
-      await storage.createNotification({
-        examId: exams[0].id,
-        title: "New Notification",
-        message: `Applications for ${exams[0].title} are now open!`,
-        type: "New"
-      });
-      if (exams.length > 1) {
-        await storage.createNotification({
-          examId: exams[1].id,
-          title: "Exam Date Announced",
-          message: `${exams[1].title} exam is scheduled for July 15th.`,
-          type: "Update"
-        });
-      }
-    }
+    
+    console.log("Database seeding completed.");
   }
 }
