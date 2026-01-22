@@ -18,14 +18,19 @@ export async function registerRoutes(
   registerAudioRoutes(app);
 
   // === EXAM UPDATER SERVICE ===
-  // Initialize and start the background scheduler
-  // Runs every 60 seconds for demonstration purposes (so you can see updates quickly)
-  // In production, this would be set to 24 hours (24 * 60 * 60 * 1000)
+  // Initialize background scheduler
   const examUpdater = new ExamUpdater(storage);
-  examUpdater.startScheduler(60 * 1000); 
+  
+  // Only start the internal interval if NOT running on Vercel
+  // On Vercel, we rely on Cron Jobs hitting the trigger endpoint
+  if (!process.env.VERCEL) {
+    examUpdater.startScheduler(60 * 1000); 
+  }
 
-  // Trigger manual update (for verification)
+  // Trigger manual update (for verification and Vercel Cron)
   app.post("/api/admin/trigger-update", async (req, res) => {
+    // Basic protection for cron job could be added here (e.g. checking a secret header)
+    // For now, we leave it open as requested for "free" simple setup
     try {
       const updates = await examUpdater.checkUpdates();
       res.json({ message: "Update check completed", updates });
