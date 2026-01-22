@@ -29,7 +29,12 @@ export const getQueryFn: <T>({
 }) => QueryFunction<T> =
   ({ on401: unauthorizedBehavior }) =>
   async ({ queryKey }) => {
-    const res = await fetch(queryKey.join("/") as string);
+    // Ensure the queryKey[0] is treated as the path
+    const path = queryKey[0] as string;
+    // If there are other items in queryKey (like params), they are not part of the URL path here
+    // unless explicitly handled. The previous .join('/') was likely incorrect for complex keys.
+    
+    const res = await fetch(path);
 
     if (unauthorizedBehavior === "returnNull" && res.status === 401) {
       return null;
